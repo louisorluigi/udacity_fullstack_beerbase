@@ -1,0 +1,26 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+<div class="beerDB_page_title">
+	<h1 class="beerDB_title">Add New Beer</h1>
+</div>
+<div class="mdl-grid beerDB_grids">
+<div class="mdl-card mdl-shadow--4dp beerDB_card">
+	<form action="#" method = "post">
+		<div class="mdl-textfield beerDB_textfield">
+	    <input class="mdl-textfield__input" type="text" name="name" placeholder="New Beer Name">
+  	</div>
+		<div class="mdl-textfield beerDB_textfield">
+	    <input class="mdl-textfield__input" type="text" name="description" placeholder="description">
+  	</div>
+		<div class="mdl-layout-spacer">
+			<div class="beerDB_submit">
+				<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" type="submit">
+					Submit
+				</button>
+			</div>
+		</div>
+	</form>
+</div>
+</div>
+{% endblock %}

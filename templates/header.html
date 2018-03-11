@@ -1,0 +1,18 @@
+<div class="mdl-layout mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+		<div class="mdl-layout__header-row">
+			<a href="{{url_for('showBeerTypes')}}">
+				<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+	  			Home
+				</button>
+			</a>
+        {%if "username" not in session %}
+				    <nav class="mdl-navigation" style="float:right">
+                <a class="mdl-navigation__link" href="{{url_for('showLogin')}}">Login</a>
+        {% else %}
+                <a class="mdl-navigation__link" href="{{url_for('disconnect')}}">Disconnect</a>
+        {% endif %}
+				</nav>
+		</div>
+</header>
+</div>

@@ -1,0 +1,51 @@
+.beerDB_title {
+  text-align: center;
+}
+.beerDB_card {
+  margin: 16px;
+}
+
+.beerDB_page_title {
+  justify-content: center;
+  margin: 16px;
+  padding: 16px;
+}
+
+.beerDB_grids {
+  justify-content: center;
+}
+
+.beerDB_submit {
+  justify-content: flex-end;
+  margin: 32px;
+}
+
+.beerDB_textfield {
+  margin: 16px
+}
+
+.beerDB_delete_cancel_buttons {
+  margin: 0 auto;
+    float: left;
+}
+
+.beerDB_header {
+  display: flex;
+  padding-right: 32px;
+  padding-left: 16px
+}
+
+.beerDB_form_center {
+  text-align: center;
+}
+
+.login_card {
+  text-align: center;
+  margin: 16px;
+  justify-content: center;
+
+}
+
+.beerDB_card {
+  margin: 16px;
+}

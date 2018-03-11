@@ -1,0 +1,28 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+<div class="beerDB_page_title">
+	<h2 class="beerDB_title">Edit {{beerType.type}}</h2>
+</div>
+<div class="mdl-grid beerDB_grids">
+	<div class="mdl-card mdl-shadow--4dp beerDB_card">
+		<form action="#" method = "post">
+			<div class="mdl-textfield beerDB_textfield">
+		    <input class="mdl-textfield__input" type="text" name="type" value="{{beerType.type}}">
+	  	</div>
+				<div class="beerDB_submit">
+					<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" type="submit">
+						Save
+					</button>
+					<a href = '{{url_for('showBeerTypes')}}'>
+						<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--primary">
+							Cancel
+						</button>
+					</a>
+				</div>
+		</form>
+	</div>
+</div>
+{% endblock %}
+
+### action="{{ url_for('editBeerType',beerType_id = beerType.id)}}" method = "post">

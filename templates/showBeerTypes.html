@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+<div class="beerDB_page_title">
+  <h1 class="beerDB_title">Beer Types</h1>
+</div>
+<div class="mdl-layout__header-row beerDB_page_title">
+	<a href="{{url_for('newBeerType')}}">
+		<button class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored">
+		<i class="material-icons">add</i>
+		</button>
+	</a>
+</div>
+<div class="mdl-grid beerDB_grids">
+	{% for type in beerTypes %}
+		<div class="mdl-card mdl-shadow--4dp beerDB_card">
+			<a href="{{url_for('showBeers', beerType_id=type.id)}}">
+				<div class="mdl-card__title">
+					<h3 class='mdl-card__title-text'>{{type.type}}</h3>
+				</div>
+			</a>
+	  </div>
+{% endfor %}
+{% endblock %}
+</div>
