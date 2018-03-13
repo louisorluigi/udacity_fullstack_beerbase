@@ -15,9 +15,6 @@ from flask import make_response
 import requests
 app = Flask(__name__)
 
-CLIENT_ID = json.loads(
-    open('client_secrets.json', 'r').read())['web']['client_id']
-
 APPLICATION_NAME = "Beerbase"
 
 engine = create_engine('sqlite:///beerbase.db')
@@ -41,7 +38,6 @@ def fbconnect():
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print response
 
     access_token = request.data
 
@@ -52,9 +48,7 @@ def fbconnect():
         open(fb_client_secrets_file, 'r').read())['web']['app_id']
     app_secret = json.loads(
         open(fb_client_secrets_file, 'r').read())['web']['app_secret']
-    url = ('https://graph.facebook.com/v2.10/oauth/access_token?'
-           'grant_type=fb_exchange_token&client_id=%s&client_secret=%s'
-           '&fb_exchange_token=%s') % (app_id, app_secret, access_token)
+    url = 'https://graph.facebook.com/endpoint?key=value&%s=%s|%s' % (access_token, app_id, app_secret)
     http = httplib2.Http()
     result = http.request(url, 'GET')[1]
     data = json.loads(result)
@@ -63,7 +57,7 @@ def fbconnect():
     token = 'access_token=' + data['access_token']
 
     # Use token to get user info from API.
-    url = 'https://graph.facebook.com/v2.10/me?%s&fields=name,id,email' % token
+    url = 'https://graph.facebook.com/v2.9/me?%s&fields=name,id,email,picture' % token
     http = httplib2.Http()
     result = http.request(url, 'GET')[1]
     data = json.loads(result)
@@ -71,26 +65,19 @@ def fbconnect():
     login_session['username'] = data["name"]
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
+    login_session['picture'] = data["picture"]["data"]["url"]
 
     print login_session['provider']
     print login_session['username']
     print login_session['email']
     print login_session['facebook_id']
+    print login_session['picture']
 
     # The token must be stored in the login_session in order to proplerly
     # logout, let's strip out the information before the equals sign in
     # our token.
     stored_token = token.split("=")[1]
     login_session['access_token'] = stored_token
-
-    #Get user picture
-    url = ('https://graph.facebook.com/v2.10/me/picture?%s&redirect=0'
-           '&height=200&width=200') % token
-    http = httplib2.Http()
-    result = http.request(url, 'GET')[1]
-    data = json.loads(result)
-
-    login_session['picture'] = data["data"]["url"]
 
     # Check if the user exists in the database. If not create a new user.
     user_id = get_user_id(login_session['email'])
@@ -118,8 +105,7 @@ def fbdisconnect():
     # The access token must be included to successfully logout.
     access_token = login_session['access_token']
 
-    url = ('https://graph.facebook.com/%s/permissions?'
-           'access_token=%s') % (facebook_id, access_token)
+    url = ('https://graph.facebook.com/%s/permissions?access_token=%s') % (facebook_id, access_token)
 
     http = httplib2.Http()
     result = http.request(url, 'DELETE')[1]
