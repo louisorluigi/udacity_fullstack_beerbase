@@ -4,17 +4,7 @@
 <div class="beerDB_page_title">
 <h1 class="beerDB_title">{{ beerType.type }}</h1>
 </div>
-<div class = 'flash'>
-		      {% with messages = get_flashed_messages() %}
-      {% if messages %}
 
-        <ul>
-        {% for message in messages %}
-            <li> <strong> {{ message }} </strong> </li>
-        {% endfor %}
-        </ul>
-        {% endif %}
-    {% endwith %}
 <div class="mdl-layout__header-row beerDB_page_title">
 	<a href="{{url_for('newBeer', beerType_id=beerType.id)}}">
 		<button class="mdl-button mdl-button--fab mdl-button--colored beerDB_submit">

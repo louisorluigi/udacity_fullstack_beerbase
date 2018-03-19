@@ -17,23 +17,27 @@ app = Flask(__name__)
 
 APPLICATION_NAME = "Beerbase"
 
+
 engine = create_engine('sqlite:///beerbase.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
+    print 'State = ' + state
+
     login_session['state'] = state
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
+# Login via Facebook
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
-    """Login via Facebook OAuth"""
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -42,13 +46,13 @@ def fbconnect():
     access_token = request.data
 
     # Exchange client token for long-lived server-side token
-    fb_client_secrets_file = (app.config['OAUTH_SECRETS_LOCATION'] +
-                              'fb_client_secrets.json')
+    fb_client_secrets_file = 'fb_client_secrets.json'
+
     app_id = json.loads(
         open(fb_client_secrets_file, 'r').read())['web']['app_id']
     app_secret = json.loads(
         open(fb_client_secrets_file, 'r').read())['web']['app_secret']
-    url = 'https://graph.facebook.com/endpoint?key=value&%s=%s|%s' % (access_token, app_id, app_secret)
+    url = 'https://graph.facebook.com/v2.12/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (app_id, app_secret, access_token)
     http = httplib2.Http()
     result = http.request(url, 'GET')[1]
     data = json.loads(result)
@@ -57,7 +61,7 @@ def fbconnect():
     token = 'access_token=' + data['access_token']
 
     # Use token to get user info from API.
-    url = 'https://graph.facebook.com/v2.9/me?%s&fields=name,id,email,picture' % token
+    url = 'https://graph.facebook.com/v2.12/me?%s&fields=name,id,email,picture' % token
     http = httplib2.Http()
     result = http.request(url, 'GET')[1]
     data = json.loads(result)
@@ -80,9 +84,9 @@ def fbconnect():
     login_session['access_token'] = stored_token
 
     # Check if the user exists in the database. If not create a new user.
-    user_id = get_user_id(login_session['email'])
-    if user_id is None:
-        user_id = create_user()
+    user_id = getUserID(data["email"])
+    if not user_id:
+        user_id = createUser(login_session)
     login_session['user_id'] = user_id
 
     output = ''
@@ -97,9 +101,9 @@ def fbconnect():
     print "done!"
     return output
 
-
+# Logout
+@app.route('/disconnect')
 def fbdisconnect():
-    """Logout via Facebook OAuth."""
     facebook_id = login_session['facebook_id']
 
     # The access token must be included to successfully logout.
@@ -121,6 +125,30 @@ def fbdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+# User handeling functions
+
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+
 #JSON APIs for Beer Types
 @app.route('/beerbase/JSON')
 def beerTypesJSON():
@@ -141,6 +169,7 @@ def beersInTypeJSON(beerType_id):
 def showBeerTypes():
     beerTypes = session.query(BeerType).all()
     return render_template('showBeerTypes.html', beerTypes = beerTypes)
+    print login_session
 
 #Add Beer Type
 @app.route('/beerbase/new/', methods=['GET', 'POST'])
@@ -159,6 +188,8 @@ def newBeerType():
 @app.route('/')
 @app.route('/beerbase/<int:beerType_id>/edit/', methods=['GET', 'POST'])
 def editBeerType(beerType_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     editedBeerType = session.query(BeerType).filter_by(id=beerType_id).one()
     if request.method == 'POST':
         if request.form['type']:
@@ -172,6 +203,8 @@ def editBeerType(beerType_id):
 # Del Beer Type
 @app.route('/beerbase/<int:beerType_id>/del', methods=['GET', 'POST'])
 def delBeerType(beerType_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     delBeerType = session.query(BeerType).filter_by(id=beerType_id).one()
     if request.method == 'POST':
         session.delete(delBeerType)
@@ -191,6 +224,8 @@ def showBeers(beerType_id):
 #Add new Beer
 @app.route('/beerbase/<int:beerType_id>/new/', methods=['GET', 'POST'])
 def newBeer(beerType_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
         addBeer = Beer(name=request.form['name'], description=request.form['description'], type_id=beerType_id)
         session.add(addBeer)
@@ -202,6 +237,8 @@ def newBeer(beerType_id):
 #Edit Beer
 @app.route('/beerbase/<int:beerType_id>/<int:beer_id>/edit/', methods=['GET', 'POST'])
 def editBeer(beerType_id, beer_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     editBeer = session.query(Beer).filter_by(id=beer_id).one()
     if request.method == 'POST':
         if request.form['name']:
@@ -217,6 +254,8 @@ def editBeer(beerType_id, beer_id):
 # Del beer
 @app.route('/beerbase/<int:beerType_id>/<int:beer_id>/del', methods=['GET', 'POST'])
 def delBeer(beerType_id, beer_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     delBeer = session.query(Beer).filter_by(id=beer_id).one()
     beerType = session.query(BeerType).filter_by(id=beerType_id).one()
     if request.method == 'POST':

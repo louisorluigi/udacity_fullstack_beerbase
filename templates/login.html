@@ -5,6 +5,9 @@
   <div class="beerDB_page_title">
     <h1 class="beerDB_title">Login to BeerBase</h1>
   </div>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
   <!--FACEBOOK SIGN IN -->
 
 <script>
@@ -49,9 +52,9 @@
            setTimeout(function() {
             window.location.href = "/beerbase";
            }, 4000);
-        } else {
-          $('#result').html('Failed to make a server-side call. Check your configuration and console.');
-           }
+          } else {
+            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+          }
         }
     });
       });
