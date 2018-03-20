@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 Base = declarative_base()
 
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = 'User'
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
@@ -19,6 +19,9 @@ class BeerType(Base):
     __tablename__='BeerType'
     id = Column(Integer, primary_key=True)
     type = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id'))
+    user = relationship(User)
+    Beer = relationship('Beer', cascade='all, delete-orphan')
 
     @property
     def serialize(self):
@@ -35,6 +38,8 @@ class Beer(Base):
     description = Column(String(250))
     type_id = Column(Integer, ForeignKey('BeerType.id'))
     type = relationship(BeerType)
+    user_id = Column(Integer, ForeignKey('User.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):

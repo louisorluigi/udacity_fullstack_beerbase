@@ -14,11 +14,11 @@
 				<textarea type ="text" class="mdl-textfield__input" name="description">{{beer.description}}</textarea>
 	  	</div>
 				<div class="beerDB_submit">
-					<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" type="submit">
+					<button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
 						Save
 					</button>
 					<a href = '{{url_for('showBeers', beerType_id=beerType_id)}}'>
-						<button class="mdl-button mdl-js-button mdl-button--raised mdl-button--primary">
+						<button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--primary">
 							Cancel
 						</button>
 					</a>

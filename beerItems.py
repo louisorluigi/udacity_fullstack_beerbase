@@ -19,47 +19,52 @@ DBSession = sessionmaker(bind=engine)
 # session.rollback()
 session = DBSession()
 
+# dummy user
+userOne = User(name="Cousin Luigi", email="cousin.luigi@pizzaparlor.com", picture=4)
+
+session.add(userOne)
+session.commit()
 
 # Add lager beer type
-beerType1 = BeerType(type="Lager")
+beerType1 = BeerType(type="Lager", user_id=1)
 
 session.add(beerType1)
 session.commit()
 
 # Add lagers
-beer1 = Beer(name="5 Points", description="Hoppy beer, with a good head, from London", type_id=beerType1.id)
+beer1 = Beer(name="5 Points", description="Hoppy beer, with a good head, from London", type_id=beerType1.id,user_id=userOne.id)
 
 session.add(beer1)
 session.commit()
 
-beer2 = Beer(name="Hell's Lager", description="From Camden brewery, popular lager for good reason", type_id=beerType1.id)
+beer2 = Beer(name="Hell's Lager", description="From Camden brewery, popular lager for good reason", type_id=beerType1.id, user_id=userOne.id)
 
 session.add(beer2)
 session.commit()
 
-beer3 = Beer(name="Meantime Lager", description="Greenwitch flagship lager, stronger than most but great for a hot day", type_id=beerType1.id)
+beer3 = Beer(name="Meantime Lager", description="Greenwitch flagship lager, stronger than most but great for a hot day", type_id=beerType1.id, user_id=userOne.id)
 
 session.add(beer3)
 session.commit()
 
 # Add Pale Ale beer type
-beerType2 = BeerType(type="Pale Ale")
+beerType2 = BeerType(type="Pale Ale", user_id=1)
 
 session.add(beerType2)
 session.commit()
 
 # Add Pale Ales
-beer1 = Beer(name="Malt Coast", description="King of Pales from the North Norfolk coast", type_id=beerType2.id)
+beer1 = Beer(name="Malt Coast", description="King of Pales from the North Norfolk coast", type_id=beerType2.id, user_id=userOne.id)
 
 session.add(beer1)
 session.commit()
 
-beer2 = Beer(name="Camden Pale Ale", description="Another solid pale ale from the camden crew", type_id=beerType2.id)
+beer2 = Beer(name="Camden Pale Ale", description="Another solid pale ale from the camden crew", type_id=beerType2.id, user_id=userOne.id)
 
 session.add(beer2)
 session.commit()
 
-beer3 = Beer(name="London Pale Ale", description="Green and black lable, tastes even better than the chocolate", type_id=beerType2.id)
+beer3 = Beer(name="London Pale Ale", description="Green and black lable, tastes even better than the chocolate", type_id=beerType2.id, user_id=userOne.id)
 
 session.add(beer3)
 session.commit()

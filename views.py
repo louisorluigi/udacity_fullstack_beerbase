@@ -120,6 +120,7 @@ def fbdisconnect():
     result = http.request(url, 'DELETE')[1]
 
     if result == '{"success":true}':
+        login_session.clear()
         response = make_response(json.dumps('You are now disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -186,6 +187,7 @@ def newBeerType():
         return redirect('/login')
     if request.method == 'POST':
         newBeerType = BeerType(type=request.form['type'])
+        user_id = login_session['user_id']
         session.add(newBeerType)
         session.commit()
         return redirect(url_for('showBeerTypes'))
@@ -197,9 +199,14 @@ def newBeerType():
 @app.route('/')
 @app.route('/beerbase/<int:beerType_id>/edit/', methods=['GET', 'POST'])
 def editBeerType(beerType_id):
+    editedBeerType = session.query(BeerType).filter_by(id=beerType_id).one()
     if 'username' not in login_session:
         return redirect('/login')
-    editedBeerType = session.query(BeerType).filter_by(id=beerType_id).one()
+    if editedBeerType.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('As you did not\
+               create this entry you do not have permission to\
+               change it. You can only change the entries you make.\
+                );}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['type']:
             editedBeerType.type = request.form['type']
@@ -213,9 +220,14 @@ def editBeerType(beerType_id):
 # Del Beer Type
 @app.route('/beerbase/<int:beerType_id>/del', methods=['GET', 'POST'])
 def delBeerType(beerType_id):
+    delBeerType = session.query(BeerType).filter_by(id=beerType_id).one()
     if 'username' not in login_session:
         return redirect('/login')
-    delBeerType = session.query(BeerType).filter_by(id=beerType_id).one()
+    if delBeerType.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('As you did not\
+               create this entry you do not have permission to\
+               change it. You can only change the entries you make.\
+                );}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         session.delete(delBeerType)
         session.commit()
@@ -242,6 +254,7 @@ def newBeer(beerType_id):
         addBeer = Beer(name=request.form['name'],
                        description=request.form['description'],
                        type_id=beerType_id)
+        user_id = login_session['user_id']
         session.add(addBeer)
         session.commit()
         return redirect(url_for('showBeers', beerType_id=beerType_id))
@@ -253,9 +266,14 @@ def newBeer(beerType_id):
 @app.route('/beerbase/<int:beerType_id>/<int:beer_id>/edit/',
            methods=['GET', 'POST'])
 def editBeer(beerType_id, beer_id):
+    editBeer = session.query(Beer).filter_by(id=beer_id).one()
     if 'username' not in login_session:
         return redirect('/login')
-    editBeer = session.query(Beer).filter_by(id=beer_id).one()
+    if editBeer.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('As you did not\
+               create this entry you do not have permission to\
+               change it. You can only change the entries you make.\
+                );}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         if request.form['name']:
             editBeer.name = request.form['name']
@@ -274,10 +292,15 @@ def editBeer(beerType_id, beer_id):
 @app.route('/beerbase/<int:beerType_id>/<int:beer_id>/del',
            methods=['GET', 'POST'])
 def delBeer(beerType_id, beer_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     delBeer = session.query(Beer).filter_by(id=beer_id).one()
     beerType = session.query(BeerType).filter_by(id=beerType_id).one()
+    if 'username' not in login_session:
+        return redirect('/login')
+    if delBeer.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('As you did not\
+               create this entry you do not have permission to\
+               change it. You can only change the entries you make.\
+                );}</script><body onload='myFunction()'>"
     if request.method == 'POST':
         session.delete(delBeer)
         session.commit()
